@@ -1,8 +1,8 @@
 import { Formik } from "formik";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
-
 interface FormData {
+  addressType: string;
   street: string;
   city: string;
   pin: string;
@@ -10,8 +10,18 @@ interface FormData {
   country: string;
 }
 
+const getDatafromLS = () => {
+  const data = localStorage.getItem("inf");
+  if (data) {
+    return JSON.parse(data);
+  } else {
+    return [];
+  }
+};
+
 export const Addressform = () => {
   const initialValues: FormData = {
+    addressType: "",
     street: "",
     city: "",
     pin: "",
@@ -20,15 +30,50 @@ export const Addressform = () => {
   };
 
   const validationSchema = Yup.object({
-    street: Yup.string().required("Required"),
+    addressType: Yup.string().oneOf(
+      ["billing", "dispatch", "mailing"],
+      "Invalid address type"
+    ).required("Required"),
+    street: Yup.string(),
     city: Yup.string().required("Required"),
-    pin: Yup.number()
-      .min(6, "Enter correct pin code. It must contain 6 numbers")
-      .max(6, "Enter correct pin code. It must contain 6 numbers")
-      .required("Required"),
+    pin: Yup.number().min(
+      6,
+      "Enter correct pin code. It must contain 6 numbers"
+    ),
     state: Yup.string().required("Required"),
     country: Yup.string().required("Required"),
   });
+
+  const [infos, setinfos] = useState(getDatafromLS());
+  const [street, setStreet] = useState("");
+  const [city, setCity] = useState("");
+  const [pin, setPin] = useState("");
+  const [state, setState] = useState("");
+  const [country, setCountry] = useState("");
+
+  const HandleFormSubmit = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+
+    let info = {
+      street,
+      city,
+      pin,
+      state,
+      country,
+    };
+    setinfos([...infos, info]);
+    setStreet("");
+    setCity("");
+    setPin("");
+    setState("");
+    setCountry("");
+
+    useEffect(() => {
+      localStorage.setItem("infos", JSON.stringify(infos));
+    }, []);
+  };
+
+  
 
   return (
     <Formik
@@ -36,28 +81,66 @@ export const Addressform = () => {
       validationSchema={validationSchema}
       validateOnMount
       onSubmit={(values): void => {
-        console.log(values);
+        const records = localStorage.getItem("addresses");
+        console.log("existing", records);
+        const result = records ? (JSON.parse(records) as FormData[]) : [];
+        console.log("parse", result);
+        const newData = result.concat([values]);
+        localStorage.setItem("addresses", JSON.stringify(newData));
+        console.log(records ? JSON.parse(records) : records);
+        // console.log(result);
+        console.log(localStorage.getItem("addresses"));
       }}
     >
       {(props) => {
         const {
           setFieldValue,
           submitForm,
-          values,
           isSubmitting,
           isValid,
           errors,
         } = props;
         console.log(errors);
         return (
-          <form>
+          <form autoComplete="off" onSubmit={HandleFormSubmit}>
+            {/* <table>
+              <thead>
+                <tr>
+                  <th>Street</th>
+                  <th>City</th>
+                  <th>Pin</th>
+                  <th>State</th>
+                  <th>Country</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table> */}
             <h1>Address Form</h1>
+            <br />
+            <label>Address Type</label>
+            <select
+              defaultValue={"default"}
+              name="Address Type"
+              id="addressType"
+            >
+              <option value={"default"} disabled>
+                Choose an option
+              </option>
+              <option value="billing">Billing</option>
+              <option value="dispatch">Dispatch</option>
+              <option value="mailing">Mailing</option>
+            </select>
+            
             <label>street</label>
             <input
               type="input"
               name="street"
               onChange={(e): void => {
-                setFieldValue("input", e.target.value);
+                setFieldValue("street", e.target.value);
               }}
             />
             <label>City</label>
@@ -65,7 +148,7 @@ export const Addressform = () => {
               type="input"
               name="city"
               onChange={(e): void => {
-                setFieldValue("input", e.target.value);
+                setFieldValue("city", e.target.value);
               }}
             />
             <label>Pin code</label>
@@ -97,8 +180,7 @@ export const Addressform = () => {
             <button
               type="submit"
               disabled={isSubmitting || !isValid}
-              onClick={(): void => {
-                console.log(values);
+              onClick={(onSubmit): void => {
                 submitForm();
               }}
             >

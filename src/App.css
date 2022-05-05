@@ -1,24 +1,32 @@
 .App {
-  text-align: center;
+  text-align:left;
 }
 
 body{
   background-color:white;
-  justify-content: center;
+  justify-content:left;
   display: flex;
+  padding: 20px;
+}
+
+select{
+  width: 250px;
+  height: 26px;;
+  font-size: 14px;
+  border-radius: 5px;
 }
 
 label {
   font-weight: bold;
   display: block;
-  text-align: center;
-  margin-right: 20px;
-  margin: 30px;
-  /* width: 500px; */
+  text-align:left;
+  margin: 20px;
 }
 
 h1 {
-  align-content: center;
+  text-align: center;
+  font-weight: bold;
+  color: blueviolet;
 }
 
 button {
@@ -40,6 +48,7 @@ input {
   font-size: 14px;
   line-height: 1px;
   border-radius: 5px;
+  color:black;
 }
 div {
   display:flex;
@@ -50,23 +59,17 @@ div {
   color: grey;
   background-image: none;
   border-radius: 10px;
-  padding: 10px;
-}
-p {
-  display: flexbox;
-  justify-content: center;
-  font-weight: bold;
-}
-form{
-  display: flexbox;
-  justify-content:baseline;
-  margin-top: 50px;
-  margin-bottom: 50px;
-  width: 1000px;
-  padding: auto;
-  text-align: center;
 }
 
-input{
-  color:black;
+form{
+  display: flexbox;
+  justify-content:center;
+  margin-top: 50px;
+  width: 1000px;
+  padding: auto;
+  text-align:left;
+}
+
+table{
+  text-align: right;
 }
